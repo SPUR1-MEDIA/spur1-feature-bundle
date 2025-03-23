@@ -1,33 +1,25 @@
 <?php
 
-/*
- * This file is part of the NovawayFeatureFlagBundle package.
- * (c) Novaway <https://github.com/novaway/NovawayFeatureFlagBundle>
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+namespace Spur1\FeatureBundle\Model;
 
-namespace Novaway\Bundle\FeatureFlagBundle\Model;
-
-interface Feature
+class Feature
 {
-    /**
-     * Get key
-     */
-    public function getKey(): string;
+    private string $name;
+    private bool $enabled;
 
-    /**
-     * Get description
-     */
-    public function getDescription(): string;
+    public function __construct(string $name, bool $enabled)
+    {
+        $this->name = $name;
+        $this->enabled = $enabled;
+    }
 
-    /**
-     * Check if flag is enabled
-     */
-    public function isEnabled(): bool;
-
-    /**
-     * @return array{key: string, enabled: bool, description: string}
-     */
-    public function toArray(): array;
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
 }

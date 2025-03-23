@@ -1,7 +1,4 @@
-.phpunit.cache/
-tools/vendor/
-tools/composer.lock
-vendor/
-.php-cs-fixer.cache
+/vendor/
 composer.lock
-coverage.xml
+package-lock.json
+/node_modules/

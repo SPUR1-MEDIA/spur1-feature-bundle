@@ -1,0 +1,41 @@
+parameters:
+    spur1_feature.throw_exceptions: false
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Spur1\FeatureBundle\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+
+    Spur1\FeatureBundle\Twig\Extension\:
+        resource: '../src/Twig/Extension/'
+        tags: ['twig.extension']
+
+    Spur1\FeatureBundle\Service\FeatureService:
+        arguments:
+            $kernel: '@kernel'
+            $logger: '@logger'
+            $throwExceptions: '%spur1_feature.throw_exceptions%'
+
+    Spur1\FeatureBundle\Twig\Runtime\FeatureExtensionRuntime:
+        arguments:
+            $featureService: '@Spur1\FeatureBundle\Service\FeatureService'
+    
+    Spur1\FeatureBundle\EventSubscriber\FeatureSubscriber:
+        arguments:
+            $featureService: '@Spur1\FeatureBundle\Service\FeatureService'
+    
+    Spur1\FeatureBundle\ExpressionLanguage\FeatureFlagExpressionLanguageProvider:
+        arguments:
+            $featureService: '@Spur1\FeatureBundle\Service\FeatureService'
+    
+    Spur1\FeatureBundle\DataCollector\FeatureDataCollector:
+        arguments:
+            $featureService: '@Spur1\FeatureBundle\Service\FeatureService'
+        tags:
+            - { name: 'data_collector', id: 'feature_collector', template: '@Spur1Feature/features.html.twig', priority: 0 }

@@ -1,37 +1,25 @@
 <?php
 
-/*
- * This file is part of the NovawayFeatureFlagBundle package.
- * (c) Novaway <https://github.com/novaway/NovawayFeatureFlagBundle>
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+namespace Spur1\FeatureBundle\ExpressionLanguage;
 
-namespace Novaway\Bundle\FeatureFlagBundle\ExpressionLanguage;
-
-use Novaway\Bundle\FeatureFlagBundle\Manager\ChainedFeatureManager;
+use Spur1\FeatureBundle\Service\FeatureService;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 final class FeatureFlagExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
-    public function __construct(
-        private readonly ChainedFeatureManager $featureManager,
-    ) {
+    public function __construct(private FeatureService $featureService)
+    {
+        
     }
 
     public function getFunctions(): array
     {
         return [
             new ExpressionFunction(
-                'is_feature_enabled',
+                'feature',
                 fn ($str) => sprintf('$this->isFeatureEnabled(%s)', $str),
-                fn ($arguments, $str) => $this->featureManager->isEnabled($str),
-            ),
-            new ExpressionFunction(
-                'is_feature_disabled',
-                fn ($str) => sprintf('$this->isFeatureDisabled(%s)', $str),
-                fn ($arguments, $str) => $this->featureManager->isDisabled($str),
+                fn ($arguments, $str) => $this->featureService->getFeature($str),
             ),
         ];
     }

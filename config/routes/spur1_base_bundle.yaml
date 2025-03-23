@@ -1,0 +1,3 @@
+spur1_feature_bundle:
+    resource: '@Spur1FeatureBundle/config/routes.xml'
+    prefix: /
