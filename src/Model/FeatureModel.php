@@ -2,7 +2,7 @@
 
 namespace Spur1\FeatureBundle\Model;
 
-class Feature
+class FeatureModel
 {
     private string $name;
     private bool $enabled;

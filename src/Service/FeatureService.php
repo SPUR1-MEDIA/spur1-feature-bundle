@@ -4,14 +4,14 @@ namespace Spur1\FeatureBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Dotenv\Dotenv;
-use Spur1\FeatureBundle\Model\Feature;
+use Spur1\FeatureBundle\Model\FeatureModel;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Spur1\FeatureBundle\Exception\FeatureNotFoundException;
 use Spur1\FeatureBundle\Exception\MissingFeatureFileException;
 
 class FeatureService
 {
-    /** @var Feature[] */
+    /** @var FeatureModel[] */
     private array $features = [];
 
     public function __construct(private KernelInterface $kernel, private LoggerInterface $logger, private bool $throwExceptions)
@@ -27,7 +27,7 @@ class FeatureService
                 if (strpos($line, '=') !== false) {
                     [$key, $value] = explode('=', $line, 2);
                     $enabled = filter_var(trim($value), FILTER_VALIDATE_BOOLEAN);
-                    $this->features[$key] = new Feature($key, $enabled);
+                    $this->features[$key] = new FeatureModel($key, $enabled);
                 }
             }
         } else {
@@ -39,7 +39,7 @@ class FeatureService
         }
     }
 
-    public function getFeature(string $featureName): Feature
+    public function getFeature(string $featureName): FeatureModel
     {
         if (!isset($this->features[$featureName])) {
             if ($this->throwExceptions) {
@@ -47,7 +47,7 @@ class FeatureService
             }
 
             $this->logger->warning("Feature '{$featureName}' not found. Defaulting to disabled.");
-            return new Feature($featureName, false);
+            return new FeatureModel($featureName, false);
         }
 
         return $this->features[$featureName];
@@ -59,7 +59,7 @@ class FeatureService
     }
 
     /**
-     * @return Feature[]
+     * @return FeatureModel[]
      */
     public function getAllFeatures(): array
     {

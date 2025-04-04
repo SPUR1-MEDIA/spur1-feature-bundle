@@ -3,7 +3,7 @@
 namespace Spur1\FeatureBundle\EventSubscriber;
 
 use ReflectionMethod;
-use Spur1\FeatureBundle\Attribute\FeatureAttribute;
+use Spur1\FeatureBundle\Attribute\Feature;
 use Spur1\FeatureBundle\Service\FeatureService;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -24,7 +24,7 @@ class FeatureSubscriber implements EventSubscriberInterface
             [$controllerInstance, $method] = $controller;
             $reflectionMethod = new ReflectionMethod($controllerInstance, $method);
 
-            foreach ($reflectionMethod->getAttributes(FeatureAttribute::class) as $attribute) {
+            foreach ($reflectionMethod->getAttributes(Feature::class) as $attribute) {
                 $featureName = $attribute->newInstance()->featureName;
                 $feature = $this->featureService->getFeature($featureName);
 
