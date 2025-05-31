@@ -20,8 +20,6 @@ class FeatureService
         $featuresFile = $projectDir . '/.env.features';
 
         if (file_exists($featuresFile)) {
-            //$dotenv = new Dotenv();
-
             $envData = file($featuresFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach ($envData as $line) {
                 if (strpos($line, '=') !== false) {
@@ -47,9 +45,15 @@ class FeatureService
             }
 
             $this->logger->warning("Feature '{$featureName}' not found. Defaulting to disabled.");
-            return new FeatureModel($featureName, false);
+
+            $feature = new FeatureModel($featureName, false);
+            $this->features[$featureName] = $feature;
+            $this->appendFeatureToFile($featureName);
+            
+            return $feature;
         }
 
+        $this->appendFeatureToFile($featureName);
         return $this->features[$featureName];
     }
 
@@ -63,6 +67,32 @@ class FeatureService
      */
     public function getAllFeatures(): array
     {
+        foreach($this->features as $feature) {
+            $this->appendFeatureToFile($feature->getName());
+        }
+
         return array_values($this->features);
+    }
+
+    private function appendFeatureToFile(string $featureName): void
+    {
+        $projectDir = $this->kernel->getProjectDir();
+        $featuresFile = $projectDir . '/.env.features';
+
+        // Nur wenn Datei existiert (ansonsten sollte Exception bereits geworfen sein)
+        if (!file_exists($featuresFile)) {
+            $this->logger->error("Cannot append feature '{$featureName}' because file '{$featuresFile}' does not exist.");
+            return;
+        }
+
+        // Prüfen, ob Feature bereits in Datei (Edge Case bei Race Conditions)
+        $currentLines = file($featuresFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($currentLines as $line) {
+            if (str_starts_with($line, $featureName . '=')) {
+                return;
+            }
+        }
+
+        file_put_contents($featuresFile, PHP_EOL . $featureName . '=FALSE', FILE_APPEND);
     }
 }
